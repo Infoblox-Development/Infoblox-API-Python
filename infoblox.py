@@ -54,7 +54,7 @@ class Infoblox(object):
 	delete_network_extattrs
     """
 
-    def __init__(self, iba_ipaddr, iba_user, iba_password, iba_wapi_version, iba_dns_view, iba_network_view, iba_verify_ssl):
+    def __init__(self, iba_ipaddr, iba_user, iba_password, iba_wapi_version, iba_dns_view, iba_network_view, iba_verify_ssl=True):
 	""" Class initialization method
 	:param iba_ipaddr: IBA IP address of management interface
 	:param iba_user: IBA user name
