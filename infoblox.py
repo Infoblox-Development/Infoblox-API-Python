@@ -92,7 +92,10 @@ class Infoblox(object):
 			return ip_v4
 		    else:
 			if 'text' in r_json:
-			    raise InfobloxNoIPavailableException(r_json['text'])
+			    if 'code' in r_json and r_json['code'] == 'Client.Ibap.Data':
+				raise InfobloxNoIPavailableException(r_json['text'])
+			    else:
+				raise InfobloxGeneralException(r_json['text'])
 			else:
 			    r.raise_for_status()
 		else:
