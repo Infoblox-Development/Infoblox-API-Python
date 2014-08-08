@@ -105,7 +105,9 @@ class Infoblox(object):
 		    raise InfobloxGeneralException(r_json['text'])
 		else:
 		    r.raise_for_status()
-	except Exception as e:
+	except ValueError:
+	    raise Exception(r)
+	except Exception:
 	    raise
 
     def create_host_record(self, ip_v4, fqdn):
@@ -125,7 +127,9 @@ class Infoblox(object):
 		    raise InfobloxGeneralException(r_json['text'])
 		else:
 		    r.raise_for_status()
-	except Exception as e:
+	except ValueError:
+	    raise Exception(r)
+	except Exception:
 	    raise
 
     def delete_host_record(self, fqdn):
@@ -158,7 +162,9 @@ class Infoblox(object):
 		    raise InfobloxGeneralException(r_json['text'])
 		else:
 		    r.raise_for_status()
-	except Exception as e:
+	except ValueError:
+	    raise Exception(r)
+	except Exception:
 	    raise
 
     def add_host_alias(self, host_fqdn, alias_fqdn):
@@ -198,7 +204,9 @@ class Infoblox(object):
 		    raise InfobloxGeneralException(r_json['text'])
 		else:
 		    r.raise_for_status()
-	except Exception as e:
+	except ValueError:
+	    raise Exception(r)
+	except Exception:
 	    raise
 
     def delete_host_alias(self, host_fqdn, alias_fqdn):
@@ -238,7 +246,9 @@ class Infoblox(object):
 		    raise InfobloxGeneralException(r_json['text'])
 		else:
 		    r.raise_for_status()
-	except Exception as e:
+	except ValueError:
+	    raise Exception(r)
+	except Exception:
 	    raise
 
     def create_cname_record(self, canonical, name):
@@ -258,7 +268,9 @@ class Infoblox(object):
 		    raise InfobloxGeneralException(r_json['text'])
 		else:
 		    r.raise_for_status()
-	except Exception as e:
+	except ValueError:
+	    raise Exception(r)
+	except Exception:
 	    raise
 
     def delete_cname_record(self, fqdn):
@@ -291,7 +303,9 @@ class Infoblox(object):
 		    raise InfobloxGeneralException(r_json['text'])
 		else:
 		    r.raise_for_status()
-	except Exception as e:
+	except ValueError:
+	    raise Exception(r)
+	except Exception:
 	    raise
 
     def create_dhcp_range(self, start_ip_v4, end_ip_v4):
@@ -311,7 +325,9 @@ class Infoblox(object):
 		    raise InfobloxGeneralException(r_json['text'])
 		else:
 		    r.raise_for_status()
-	except Exception as e:
+	except ValueError:
+	    raise Exception(r)
+	except Exception:
 	    raise
 
     def delete_dhcp_range(self, start_ip_v4, end_ip_v4):
@@ -345,7 +361,9 @@ class Infoblox(object):
 		    raise InfobloxGeneralException(r_json['text'])
 		else:
 		    r.raise_for_status()
-	except Exception as e:
+	except ValueError:
+	    raise Exception(r)
+	except Exception:
 	    raise
 
     def get_host(self, fqdn, fields=None):
@@ -371,7 +389,9 @@ class Infoblox(object):
 		    raise InfobloxNotFoundException(r_json['text'])
 		else:
 		    r.raise_for_status()
-	except Exception as e:
+	except ValueError:
+	    raise Exception(r)
+	except Exception:
 	    raise
 
     def get_host_by_ip(self, ip_v4):
@@ -396,7 +416,9 @@ class Infoblox(object):
 		    raise InfobloxGeneralException(r_json['text'])
 		else:
 		    r.raise_for_status()
-	except Exception as e:
+	except ValueError:
+	    raise Exception(r)
+	except Exception:
 	    raise
 
     def get_ip_by_host(self, fqdn):
@@ -424,7 +446,9 @@ class Infoblox(object):
 		    raise InfobloxGeneralException(r_json['text'])
 		else:
 		    r.raise_for_status()
-	except Exception as e:
+	except ValueError:
+	    raise Exception(r)
+	except Exception:
 	    raise
 
     def get_host_extattrs(self, fqdn, attributes=None):
@@ -456,7 +480,9 @@ class Infoblox(object):
 		    raise InfobloxNotFoundException(r_json['text'])
 		else:
 		    r.raise_for_status()
-	except Exception as e:
+	except ValueError:
+	    raise Exception(r)
+	except Exception:
 	    raise
 
     def get_network(self, network, fields=None):
@@ -482,7 +508,9 @@ class Infoblox(object):
 		    raise InfobloxNotFoundException(r_json['text'])
 		else:
 		    r.raise_for_status()
-	except Exception as e:
+	except ValueError:
+	    raise Exception(r)
+	except Exception:
 	    raise
 
     def get_network_by_ip(self, ip_v4):
@@ -507,7 +535,9 @@ class Infoblox(object):
 		    raise InfobloxNotFoundException(r_json['text'])
 		else:
 		    r.raise_for_status()
-	except Exception as e:
+	except ValueError:
+	    raise Exception(r)
+	except Exception:
 	    raise
 
     def get_network_by_extattrs(self, attributes):
@@ -539,7 +569,9 @@ class Infoblox(object):
 		    raise InfobloxGeneralException(r_json['text'])
 		else:
 		    r.raise_for_status()
-	except Exception as e:
+	except ValueError:
+	    raise Exception(r)
+	except Exception:
 	    raise
 
     def get_host_by_extattrs(self, attributes):
@@ -571,7 +603,9 @@ class Infoblox(object):
 		    raise InfobloxNotFoundException(r_json['text'])
 		else:
 		    r.raise_for_status()
-	except Exception as e:
+	except ValueError:
+	    raise Exception(r)
+	except Exception:
 	    raise
 
     def get_network_extattrs(self, network, attributes=None):
@@ -603,7 +637,9 @@ class Infoblox(object):
 		    raise InfobloxNotFoundException(r_json['text'])
 		else:
 		    r.raise_for_status()
-	except Exception as e:
+	except ValueError:
+	    raise Exception(r)
+	except Exception:
 	    raise
 
     def update_network_extattrs(self, network, attributes):
@@ -642,7 +678,9 @@ class Infoblox(object):
 		    raise InfobloxGeneralException(r_json['text'])
 		else:
 		    r.raise_for_status()
-	except Exception as e:
+	except ValueError:
+	    raise Exception(r)
+	except Exception:
 	    raise
 
     def delete_network_extattrs(self, network, attributes):
@@ -681,7 +719,9 @@ class Infoblox(object):
 		    raise InfobloxGeneralException(r_json['text'])
 		else:
 		    r.raise_for_status()
-	except Exception as e:
+	except ValueError:
+	    raise Exception(r)
+	except Exception:
 	    raise
 
     def create_network(self, network):
@@ -700,7 +740,9 @@ class Infoblox(object):
 		    raise InfobloxGeneralException(r_json['text'])
 		else:
 		    r.raise_for_status()
-	except Exception as e:
+	except ValueError:
+	    raise Exception(r)
+	except Exception:
 	    raise
 
     def delete_network(self, network):
@@ -733,7 +775,9 @@ class Infoblox(object):
 		    raise InfobloxGeneralException(r_json['text'])
 		else:
 		    r.raise_for_status()
-	except Exception as e:
+	except ValueError:
+	    raise Exception(r)
+	except Exception:
 	    raise
 
     def create_networkcontainer(self, networkcontainer):
@@ -752,7 +796,9 @@ class Infoblox(object):
 		    raise InfobloxGeneralException(r_json['text'])
 		else:
 		    r.raise_for_status()
-	except Exception as e:
+	except ValueError:
+	    raise Exception(r)
+	except Exception:
 	    raise
 
     def delete_networkcontainer(self, networkcontainer):
@@ -785,5 +831,7 @@ class Infoblox(object):
 		    raise InfobloxGeneralException(r_json['text'])
 		else:
 		    r.raise_for_status()
-	except Exception as e:
+	except ValueError:
+	    raise Exception(r)
+	except Exception:
 	    raise
