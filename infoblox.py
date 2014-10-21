@@ -26,6 +26,9 @@ class InfobloxNoIPavailableException(Exception):
 class InfobloxGeneralException(Exception):
     pass
 
+class InfobloxBadInputParameter(Exception):
+    pass
+
 class Infoblox(object):
     """ Implements the following subset of Infoblox IPAM API via REST API
 	create_network
@@ -110,18 +113,26 @@ class Infoblox(object):
 	except Exception:
 	    raise
 
-    def create_host_record(self, ip_v4, fqdn):
-	""" Implements IBA REST API call to add IBA host record
-	:param ip_v4: host IP v4 address
+    def create_host_record(self, address, fqdn):
+	""" Implements IBA REST API call to create IBA host record
+	Returns IP v4 address assigned to the host
+	:param address: IP v4 address or NET v4 address in CIDR format to get next_available_ip from
 	:param fqdn: hostname in FQDN
 	"""
-	rest_url = 'https://' + self.iba_host + '/wapi/v' + self.iba_wapi_version + '/record:host'
-	payload = '{"ipv4addrs": [{"configure_for_dhcp": false,"ipv4addr": "' + ip_v4 + '"}],"name": "' + fqdn + '","view": "' + self.iba_dns_view + '"}'
+	if re.match("^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+\/[0-9]+$", address):
+	    ipv4addr = 'func:nextavailableip:' + address
+	else:
+	    if re.match("^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$", address):
+		ipv4addr = address
+	    else:
+		raise InfobloxBadInputParameter('Expected IP or NET address in CIDR format')
+	rest_url = 'https://' + self.iba_host + '/wapi/v' + self.iba_wapi_version + '/record:host' + '?_return_fields=ipv4addrs'
+	payload = '{"ipv4addrs": [{"configure_for_dhcp": false,"ipv4addr": "' + ipv4addr + '"}],"name": "' + fqdn + '","view": "' + self.iba_dns_view + '"}'
 	try:
 	    r = requests.post(url=rest_url, auth=(self.iba_user, self.iba_password), verify=self.iba_verify_ssl, data=payload)
 	    r_json = r.json()
 	    if r.status_code == 200 or r.status_code == 201:
-		return
+	    	return r_json['ipv4addrs'][0]['ipv4addr']
 	    else:
 		if 'text' in r_json:
 		    raise InfobloxGeneralException(r_json['text'])

@@ -40,16 +40,12 @@ Example:
 ```
 import infoblox
 
-iba_api = infoblox.Infoblox('10.10.20.32', 'admin', 'secret', '1.0', 'internal', 'default')
+iba_api = infoblox.Infoblox('10.10.20.32', 'admin', 'secret', '1.6', 'internal', 'default')
 
 try:
-    ip = iba_api.get_next_available_ip('192.168.0.0/24')
-    iba_api.create_host_record(ip, 'mytest.example.com')
+    ip = iba_api.create_host_record('192.168.0.0/24', 'mytest.example.com')
+    print ip
 except Exception as e:
     print e
 
 ```
-
-### Limitations
-
-Currently supports WAPI 1.0 only. 1.2.1 is coming soon.
