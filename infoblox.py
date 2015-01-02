@@ -47,6 +47,7 @@ class Infoblox(object):
 	get_host
 	get_host_by_ip
 	get_ip_by_host
+	get_host_by_attrs
 	get_host_by_extattrs
 	get_host_extattrs
 	get_network
