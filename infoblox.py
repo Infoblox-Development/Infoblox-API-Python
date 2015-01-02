@@ -585,6 +585,42 @@ class Infoblox(object):
 	except Exception:
 	    raise
 
+    def get_host_by_attrs(self, attributes):
+	""" Implements IBA REST API call to find host by it's attributes
+	Returns array of hosts in FQDN
+	:param attributes: comma-separated list of attrubutes name/value pairs in the format:
+		attr_name=attr_value - exact match for attribute value
+		attr_name:=attr_value - case insensitive match for attribute value
+		attr_name~=regular_expression - match attribute value by regular expression
+		attr_name>=attr_value - search by number greater than value
+		attr_name<=attr_value - search by number less than value
+		attr_name!=attr_value - search by number not equal of value
+
+        Extensible attributes are referenced with a leading "*", or use get_host_by_extattrs.
+	"""
+	rest_url = 'https://' + self.iba_host + '/wapi/v' + self.iba_wapi_version + '/record:host?' + "&".join(attributes.split(",")) + '&view=' + self.iba_dns_view
+	hosts = []
+	try:
+	    r = requests.get(url=rest_url, auth=(self.iba_user, self.iba_password), verify=self.iba_verify_ssl)
+	    r_json = r.json()
+	    if r.status_code == 200:
+		if len(r_json) > 0:
+		    for host in r_json:
+			if 'name' in host:
+			    hosts.append(host['name'])
+		    return hosts
+		else:
+		    raise InfobloxNotFoundException("No hosts found for extensible attributes: " + attributes)
+	    else:
+		if 'text' in r_json:
+		    raise InfobloxNotFoundException(r_json['text'])
+		else:
+		    r.raise_for_status()
+	except ValueError:
+	    raise Exception(r)
+	except Exception:
+	    raise
+
     def get_host_by_extattrs(self, attributes):
 	""" Implements IBA REST API call to find host by it's extensible attributes
 	Returns array of hosts in FQDN
