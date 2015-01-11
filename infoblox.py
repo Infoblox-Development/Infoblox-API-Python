@@ -122,6 +122,7 @@ class Infoblox(object):
 	if re.match("^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+\/[0-9]+$", address):
 	    #ipv4addr = 'func:nextavailableip:' + address
 	    ipv4addr =  self.get_next_available_ip(address)
+	    ipv4addr = str(ipv4addr)
 	else:
 	    if re.match("^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$", address):
 		ipv4addr = address
