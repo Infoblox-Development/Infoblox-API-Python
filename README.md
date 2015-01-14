@@ -23,6 +23,7 @@ Class **Infoblox** implements the following methods:
 - get_host_by_ip
 - get_ip_by_host
 - get_host_by_extattrs
+- get_host_by_regexp
 - get_host_extattrs
 - get_network
 - get_network_by_ip

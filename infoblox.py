@@ -47,6 +47,7 @@ class Infoblox(object):
 	get_host
 	get_host_by_ip
 	get_ip_by_host
+	get_host_by_regexp
 	get_host_by_extattrs
 	get_host_extattrs
 	get_network
@@ -405,6 +406,33 @@ class Infoblox(object):
 	except Exception:
 	    raise
 
+    def get_host_by_regexp(self, fqdn):
+	""" Implements IBA REST API call to retrieve host records by fqdn regexp filter
+	Returns array of host names in FQDN matched to given regexp filter
+	:param fqdn: hostname in FQDN or FQDN regexp filter
+	"""
+	rest_url = 'https://' + self.iba_host + '/wapi/v' + self.iba_wapi_version + '/record:host?name~=' + fqdn + '&view=' + self.iba_dns_view
+	hosts = []
+	try:
+	    r = requests.get(url=rest_url, auth=(self.iba_user, self.iba_password), verify=self.iba_verify_ssl)
+	    r_json = r.json()
+	    if r.status_code == 200:
+		if len(r_json) > 0:
+		    for host in r_json:
+			hosts.append(host['name'])
+		    return hosts
+		else:
+		    raise InfobloxNotFoundException("No hosts found for regexp filter: " + fqdn)
+	    else:
+		if 'text' in r_json:
+		    raise InfobloxGeneralException(r_json['text'])
+		else:
+		    r.raise_for_status()
+	except ValueError:
+	    raise Exception(r)
+	except Exception:
+	    raise
+
     def get_host_by_ip(self, ip_v4):
 	""" Implements IBA REST API call to find hostname by IP address
 	Returns array of host names in FQDN associated with given IP address
@@ -468,21 +496,22 @@ class Infoblox(object):
 	:param fqdn: hostname in FQDN
 	:param attributes: array of extensible attribute names (optional)
 	"""
-	rest_url = 'https://' + self.iba_host + '/wapi/v' + self.iba_wapi_version + '/record:host?name=' + fqdn + '&view=' + self.iba_dns_view + '&_return_fields=name,extensible_attributes'
+	rest_url = 'https://' + self.iba_host + '/wapi/v' + self.iba_wapi_version + '/record:host?name=' + fqdn + '&view=' + self.iba_dns_view + '&_return_fields=name,extattrs'
 	try:
 	    r = requests.get(url=rest_url, auth=(self.iba_user, self.iba_password), verify=self.iba_verify_ssl)
 	    r_json = r.json()
 	    if r.status_code == 200:
 		if len(r_json) > 0:
+		    extattrs = {}
 		    if attributes:
-			extattrs = {}
 			for attribute in attributes:
-			    if attribute in r_json[0]['extensible_attributes']:
-				extattrs[attribute] = r_json[0]['extensible_attributes'][attribute]
+			    if attribute in r_json[0]['extattrs']:
+				extattrs[attribute] = r_json[0]['extattrs'][attribute]['value']
 			    else:
 				raise InfobloxNotFoundException("No requested attribute found: " + attribute)
 		    else:
-			extattrs = r_json[0]['extensible_attributes']
+			for attribute in r_json[0]['extattrs'].keys():
+			    extattrs[attribute] = r_json[0]['extattrs'][attribute]['value']
 		    return extattrs
 		else:
 		    raise InfobloxNotFoundException("No requested host found: " + fqdn)
@@ -625,21 +654,22 @@ class Infoblox(object):
 	:param network: network in CIDR format
 	:param attributes: array of extensible attribute names (optional)
 	"""
-	rest_url = 'https://' + self.iba_host + '/wapi/v' + self.iba_wapi_version + '/network?network=' + network + '&network_view=' + self.iba_network_view + '&_return_fields=network,extensible_attributes'
+	rest_url = 'https://' + self.iba_host + '/wapi/v' + self.iba_wapi_version + '/network?network=' + network + '&network_view=' + self.iba_network_view + '&_return_fields=network,extattrs'
 	try:
 	    r = requests.get(url=rest_url, auth=(self.iba_user, self.iba_password), verify=self.iba_verify_ssl)
 	    r_json = r.json()
 	    if r.status_code == 200:
 		if len(r_json) > 0:
+		    extattrs = {}
 		    if attributes:
-			extattrs = {}
 			for attribute in attributes:
-			    if attribute in r_json[0]['extensible_attributes']:
-				extattrs[attribute] = r_json[0]['extensible_attributes'][attribute]
+			    if attribute in r_json[0]['extattrs']:
+				extattrs[attribute] = r_json[0]['extattrs'][attribute]['value']
 			    else:
 				raise InfobloxNotFoundException("No requested attribute found: " + attribute)
 		    else:
-			extattrs = r_json[0]['extensible_attributes']
+			for attribute in r_json[0]['extattrs'].keys():
+			    extattrs[attribute] = r_json[0]['extattrs'][attribute]['value']
 		    return extattrs
 		else:
 		    raise InfobloxNotFoundException("No requested network found: " + network)
@@ -658,7 +688,7 @@ class Infoblox(object):
 	:param network: network in CIDR format
 	:param attributes: hash table of extensible attributes with attribute name as a hash key
 	"""
-	rest_url = 'https://' + self.iba_host + '/wapi/v' + self.iba_wapi_version + '/network?network=' + network + '&network_view=' + self.iba_network_view + '&_return_fields=network,extensible_attributes'
+	rest_url = 'https://' + self.iba_host + '/wapi/v' + self.iba_wapi_version + '/network?network=' + network + '&network_view=' + self.iba_network_view + '&_return_fields=network,extattrs'
 	extattrs = {}
 	try:
 	    r = requests.get(url=rest_url, auth=(self.iba_user, self.iba_password), verify=self.iba_verify_ssl)
@@ -667,10 +697,10 @@ class Infoblox(object):
 		if len(r_json) > 0:
 		    network_ref = r_json[0]['_ref']
 		    if network_ref:
-			extattrs = r_json[0]['extensible_attributes']
+			extattrs = r_json[0]['extattrs']
 			for attr_name, attr_value in attributes.iteritems():
-			    extattrs[attr_name] = attr_value
-			payload = '{"extensible_attributes": ' + json.JSONEncoder().encode(extattrs) + '}'
+			    extattrs[attr_name]['value'] = attr_value
+			payload = '{"extattrs": ' + json.JSONEncoder().encode(extattrs) + '}'
 			rest_url = 'https://' + self.iba_host + '/wapi/v' + self.iba_wapi_version + '/' + network_ref
 			r = requests.put(url=rest_url, auth=(self.iba_user, self.iba_password), verify=self.iba_verify_ssl, data=payload)
 			if r.status_code == 200:
@@ -699,7 +729,7 @@ class Infoblox(object):
 	:param network: network in CIDR format
 	:param attributes: array of extensible attribute names
 	"""
-	rest_url = 'https://' + self.iba_host + '/wapi/v' + self.iba_wapi_version + '/network?network=' + network + '&network_view=' + self.iba_network_view + '&_return_fields=network,extensible_attributes'
+	rest_url = 'https://' + self.iba_host + '/wapi/v' + self.iba_wapi_version + '/network?network=' + network + '&network_view=' + self.iba_network_view + '&_return_fields=network,extattrs'
 	try:
 	    r = requests.get(url=rest_url, auth=(self.iba_user, self.iba_password), verify=self.iba_verify_ssl)
 	    r_json = r.json()
@@ -707,11 +737,11 @@ class Infoblox(object):
 		if len(r_json) > 0:
 		    network_ref = r_json[0]['_ref']
 		    if network_ref:
-			extattrs = r_json[0]['extensible_attributes']
+			extattrs = r_json[0]['extattrs']
 			for attribute in attributes:
 			    if attribute in extattrs:
 				del extattrs[attribute]
-			payload = '{"extensible_attributes": ' + json.JSONEncoder().encode(extattrs) + '}'
+			payload = '{"extattrs": ' + json.JSONEncoder().encode(extattrs) + '}'
 			rest_url = 'https://' + self.iba_host + '/wapi/v' + self.iba_wapi_version + '/' + network_ref
 			r = requests.put(url=rest_url, auth=(self.iba_user, self.iba_password), verify=self.iba_verify_ssl, data=payload)
 			if r.status_code == 200:
