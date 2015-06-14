@@ -36,6 +36,8 @@ class Infoblox(object):
 	create_networkcontainer
 	delete_networkcontainer
 	create_host_record
+	create_txt_record
+	delete_txt_record
 	delete_host_record
 	add_host_alias
 	delete_host_alias
@@ -48,6 +50,7 @@ class Infoblox(object):
 	get_host_by_ip
 	get_ip_by_host
 	get_host_by_regexp
+	get_txt_by_regexp
 	get_host_by_extattrs
 	get_host_extattrs
 	get_network
@@ -58,7 +61,7 @@ class Infoblox(object):
 	delete_network_extattrs
     """
 
-    def __init__(self, iba_ipaddr, iba_user, iba_password, iba_wapi_version, iba_dns_view, iba_network_view, iba_verify_ssl=True):
+    def __init__(self, iba_ipaddr, iba_user, iba_password, iba_wapi_version, iba_dns_view, iba_network_view, iba_verify_ssl=False):
 	""" Class initialization method
 	:param iba_ipaddr: IBA IP address of management interface
 	:param iba_user: IBA user name
@@ -75,7 +78,7 @@ class Infoblox(object):
 	self.iba_dns_view = iba_dns_view
 	self.iba_network_view = iba_network_view
         self.iba_verify_ssl = iba_verify_ssl
-	
+
     def get_next_available_ip(self, network):
 	""" Implements IBA next_available_ip REST API call
 	Returns IP v4 address
@@ -144,6 +147,29 @@ class Infoblox(object):
 	except Exception:
 	    raise
 
+    def create_txt_record(self, text, fqdn):
+	""" Implements IBA REST API call to create IBA txt record
+	Returns IP v4 address assigned to the host
+	:param text: free text to be added to the record
+	:param fqdn: hostname in FQDN
+	"""
+	rest_url = 'https://' + self.iba_host + '/wapi/v' + self.iba_wapi_version + '/record:txt'
+	payload = '{"text": "' +  text + '","name": "' + fqdn + '","view": "' + self.iba_dns_view + '"}'
+	try:
+	    r = requests.post(url=rest_url, auth=(self.iba_user, self.iba_password), verify=self.iba_verify_ssl, data=payload)
+	    r_json = r.json()
+	    if r.status_code == 200 or r.status_code == 201:
+	    	return
+	    else:
+		if 'text' in r_json:
+		    raise InfobloxGeneralException(r_json['text'])
+		else:
+		    r.raise_for_status()
+	except ValueError:
+	    raise Exception(r)
+	except Exception:
+	    raise
+
     def delete_host_record(self, fqdn):
 	""" Implements IBA REST API call to delete IBA host record
 	:param fqdn: hostname in FQDN
@@ -156,6 +182,41 @@ class Infoblox(object):
 		if len(r_json) > 0:
 		    host_ref = r_json[0]['_ref']
 		    if host_ref and re.match("record:host\/[^:]+:([^\/]+)\/", host_ref).group(1) == fqdn:
+			rest_url = 'https://' + self.iba_host + '/wapi/v' + self.iba_wapi_version + '/' + host_ref
+			r = requests.delete(url=rest_url, auth=(self.iba_user, self.iba_password), verify=self.iba_verify_ssl)
+			if r.status_code == 200:
+			    return
+			else:
+			    if 'text' in r_json:
+				raise InfobloxGeneralException(r_json['text'])
+			    else:
+				r.raise_for_status()
+		    else:
+			raise InfobloxGeneralException("Received unexpected host reference: " + host_ref)
+		else:
+		    raise InfobloxNotFoundException("No requested host found: " + fqdn)
+	    else:
+		if 'text' in r_json:
+		    raise InfobloxGeneralException(r_json['text'])
+		else:
+		    r.raise_for_status()
+	except ValueError:
+	    raise Exception(r)
+	except Exception:
+	    raise
+
+    def delete_txt_record(self, fqdn):
+	""" Implements IBA REST API call to delete IBA TXT record
+	:param fqdn: hostname in FQDN
+	"""
+	rest_url = 'https://' + self.iba_host + '/wapi/v' + self.iba_wapi_version + '/record:txt?name=' + fqdn + '&view=' + self.iba_dns_view
+	try:
+	    r = requests.get(url=rest_url, auth=(self.iba_user, self.iba_password), verify=self.iba_verify_ssl)
+	    r_json = r.json()
+	    if r.status_code == 200:
+		if len(r_json) > 0:
+		    host_ref = r_json[0]['_ref']
+		    if host_ref and re.match("record:txt\/[^:]+:([^\/]+)\/", host_ref).group(1) == fqdn:
 			rest_url = 'https://' + self.iba_host + '/wapi/v' + self.iba_wapi_version + '/' + host_ref
 			r = requests.delete(url=rest_url, auth=(self.iba_user, self.iba_password), verify=self.iba_verify_ssl)
 			if r.status_code == 200:
@@ -423,6 +484,33 @@ class Infoblox(object):
 		    return hosts
 		else:
 		    raise InfobloxNotFoundException("No hosts found for regexp filter: " + fqdn)
+	    else:
+		if 'text' in r_json:
+		    raise InfobloxGeneralException(r_json['text'])
+		else:
+		    r.raise_for_status()
+	except ValueError:
+	    raise Exception(r)
+	except Exception:
+	    raise
+
+    def get_txt_by_regexp(self, fqdn):
+	""" Implements IBA REST API call to retrieve TXT records by fqdn regexp filter
+	Returns dictonary of host names in FQDN matched to given regexp filter with the TXT value
+	:param fqdn: hostname in FQDN or FQDN regexp filter
+	"""
+	rest_url = 'https://' + self.iba_host + '/wapi/v' + self.iba_wapi_version + '/record:txt?name~=' + fqdn + '&view=' + self.iba_dns_view
+	hosts = {}
+	try:
+	    r = requests.get(url=rest_url, auth=(self.iba_user, self.iba_password), verify=self.iba_verify_ssl)
+	    r_json = r.json()
+	    if r.status_code == 200:
+		if len(r_json) > 0:
+		    for host in r_json:
+			hosts[host['name']] = host['text']
+		    return hosts
+		else:
+		    raise InfobloxNotFoundException("No txt records found for regexp filter: " + fqdn)
 	    else:
 		if 'text' in r_json:
 		    raise InfobloxGeneralException(r_json['text'])
