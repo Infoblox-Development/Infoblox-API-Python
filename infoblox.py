@@ -43,6 +43,7 @@ class Infoblox(object):
 	delete_host_alias
 	create_cname_record
 	delete_cname_record
+        update_cname_record
 	create_dhcp_range
 	delete_dhcp_range
 	get_next_available_ip
@@ -380,6 +381,39 @@ class Infoblox(object):
 	    raise Exception(r)
 	except Exception:
 	    raise
+
+    def update_cname_record(self, canonical, name):
+        """ Implements IBA REST API call to update or repoint IBA cname record
+        :param canonical: canonical name in FQDN format
+        :param name: the name for the new CNAME record in FQDN format
+        """
+        rest_url = 'https://' + self.iba_host + '/wapi/v' + self.iba_wapi_version + '/record:cname'
+        payload = json.dumps({'name': name})
+        try:
+            r = requests.get(url=rest_url, auth=(self.iba_user, self.iba_password), verify=self.iba_verify_ssl, data=payload)
+            r_json = r.json()
+            # RFC1912 - A CNAME can not coexist with any other data, we should expect utmost one entry
+            if r.status_code == 200 and len(r_json) == 1:
+                ibx_cname = r.json()[0]
+                cname_ref = ibx_cname['_ref']
+                payload = '{"canonical": ' + json.JSONEncoder().encode(canonical) + '}'
+                rest_url = 'https://' + self.iba_host + '/wapi/v' + self.iba_wapi_version + '/' + cname_ref
+                r = requests.put(url=rest_url, auth=(self.iba_user, self.iba_password), verify=self.iba_verify_ssl, data=payload)
+                if r.status_code == 200 or r.status_code == 201:
+                    return
+                else:
+                    r.raise_for_status()
+            elif len(r_json) == 0:
+              raise InfobloxNotFoundException("CNAME: " + name + " not found.")
+            else:
+                if 'text' in r_json:
+                    raise InfobloxGeneralException(r_json['text'])
+                else:
+                    r.raise_for_status()
+        except ValueError:
+            raise Exception(r)
+        except Exception:
+            raise
 
     def create_dhcp_range(self, start_ip_v4, end_ip_v4):
 	""" Implements IBA REST API call to add DHCP range for given start and end addresses
