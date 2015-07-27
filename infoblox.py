@@ -23,6 +23,9 @@ class InfobloxNotFoundException(Exception):
 class InfobloxNoIPavailableException(Exception):
     pass
 
+class InfobloxNoNetworkAvailableException(Exception):
+    pass
+
 class InfobloxGeneralException(Exception):
     pass
 
@@ -35,6 +38,7 @@ class Infoblox(object):
 	delete_network
 	create_networkcontainer
 	delete_networkcontainer
+	get_next_available_network
 	create_host_record
 	create_txt_record
 	delete_txt_record
@@ -989,6 +993,45 @@ class Infoblox(object):
 			raise InfobloxGeneralException("No network container reference received in IBA reply for network container: " + networkcontainer)
 		else:
 		    raise InfobloxNotFoundException("No network container found: " + networkcontainer)
+	    else:
+		if 'text' in r_json:
+		    raise InfobloxGeneralException(r_json['text'])
+		else:
+		    r.raise_for_status()
+	except ValueError:
+	    raise Exception(r)
+	except Exception:
+	    raise
+
+    def get_next_available_network(self, networkcontainer, cidr):
+	""" Implements IBA REST API call to retrieve next available network of network container
+	Returns network address in CIDR format
+	:param networkcontainer: network container address in CIDR format
+	:param cidr: requested network length (from 0 to 32)
+	"""
+	rest_url = 'https://' + self.iba_host + '/wapi/v' + self.iba_wapi_version + '/networkcontainer?network=' + networkcontainer + '&network_view=' + self.iba_network_view
+    	try:
+	    r = requests.get(url=rest_url, auth=(self.iba_user, self.iba_password), verify=self.iba_verify_ssl)
+	    r_json = r.json()
+	    if r.status_code == 200:
+		if len(r_json) > 0:
+		    net_ref = r_json[0]['_ref']
+		    rest_url = 'https://' + self.iba_host + '/wapi/v' + self.iba_wapi_version + '/' + net_ref + '?_function=next_available_network&cidr=' + str(cidr) + '&num=1'
+		    r = requests.post(url=rest_url, auth=(self.iba_user, self.iba_password), verify=self.iba_verify_ssl)
+		    r_json = r.json()
+		    if r.status_code == 200:
+			network = r_json['networks'][0]
+			return network
+		    else:
+			if 'text' in r_json:
+			    if 'code' in r_json and r_json['code'] == 'Client.Ibap.Data':
+				raise InfobloxNoNetworkAvailableException(r_json['text'])
+			    else:
+				raise InfobloxGeneralException(r_json['text'])
+			else:
+			    r.raise_for_status()
+		else:
+		    raise InfobloxNotFoundException("No requested network container found: " + networkcontainer)
 	    else:
 		if 'text' in r_json:
 		    raise InfobloxGeneralException(r_json['text'])

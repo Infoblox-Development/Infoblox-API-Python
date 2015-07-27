@@ -10,6 +10,7 @@ Class **Infoblox** implements the following methods:
 - delete_network
 - create_networkcontainer
 - delete_networkcontainer
+- get_next_available_network
 - create_host_record
 - create_txt_record
 - delete_host_record
