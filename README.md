@@ -18,6 +18,7 @@ Class **Infoblox** implements the following methods:
 - delete_host_alias
 - create_cname_record
 - delete_cname_record
+- update_cname_record
 - create_dhcp_range
 - delete_dhcp_range
 - get_next_available_ip
