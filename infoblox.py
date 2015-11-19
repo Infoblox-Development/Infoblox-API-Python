@@ -1037,7 +1037,7 @@ class Infoblox(object):
 		    raise InfobloxGeneralException(r_json['text'])
 		else:
 		    r.raise_for_status()
-	except ValueError:
-	    raise Exception(r)
-	except Exception:
-	    raise
+        except ValueError:
+            raise Exception(r)
+        except Exception:
+            raise
