@@ -64,6 +64,9 @@ class Infoblox(object):
 	get_network_extattrs
 	update_network_extattrs
 	delete_network_extattrs
+        csv_insert
+        csv_delete
+        csv_upload
     """
 
     def __init__(self, iba_ipaddr, iba_user, iba_password, iba_wapi_version, iba_dns_view, iba_network_view, iba_verify_ssl=False):
@@ -1041,3 +1044,40 @@ class Infoblox(object):
             raise Exception(r)
         except Exception:
             raise
+
+    # Note: The upload takes the action of stopping if a line fails, rather than trying the next one.
+    #       We may want to change that in the future.
+    def csv_upload(self, filename, operation):
+        # create the request url for init.
+        rest_url_pre = 'https://' + self.iba_host + '/wapi/v' + self.iba_wapi_version
+
+        try:
+            init_url = rest_url_pre + '/fileop?_function=uploadinit'
+            # send request to the server to establish the object, with token and url.
+            r = requests.post(url=init_url, auth=(self.iba_user, self.iba_password), verify=self.iba_verify_ssl)
+            r_json = r.json()
+
+            # need to do escaping or we will have issues when it's sent to the requests.post
+            token = r_json['token'].encode('unicode-escape')
+            req_url = r_json['url']
+            files = {'file': (filename, open(filename, 'rb')) }
+            file_r = requests.post(url=req_url, auth=(self.iba_user, self.iba_password), verify=self.iba_verify_ssl, files=files)
+
+            # Use the token to tell the server to process the file as a csv_import
+            csv_url = rest_url_pre + '/fileop?_function=csv_import'
+            payload = '{ "token": "' + token + '", "operation": "' + operation + '" }'
+            requests.post(url=csv_url, auth=(self.iba_user, self.iba_password), verify=self.iba_verify_ssl, data=payload)
+
+        except ValueError:
+            raise Exception(r)
+        except Exception:
+            raise
+
+    # Inserts the columns from elements associated with columns in the CSV.
+    def csv_insert(self, filename):
+        self.csv_upload(filename, 'INSERT')
+
+    # Deletes the columns from elements associated with columns in the CSV.
+    def csv_delete(self, filename):
+        self.csv_upload(filename, 'DELETE')
+
