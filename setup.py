@@ -7,10 +7,12 @@ README = open(os.path.join(here, 'README.md')).read()
 
 setup(
     name='infoblox',
-    version='1.1',
+    version='1.1.1',
     description='The module implements Infoblox IPAM API via REST API',
     long_description=README,
     license = 'Licensed under the Apache License, Version 2.0',
-    packages=['.'],
+    packages=['infoblox'],
     install_requires=['requests'],
+    tests_require=['responses'],
+    test_suite='infoblox.tests',
 )
