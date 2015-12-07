@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import click
-from infoblox.infoblox import Infoblox
+from .infoblox import Infoblox
 
 
 @click.group()
