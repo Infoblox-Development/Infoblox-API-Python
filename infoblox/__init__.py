@@ -2,4 +2,4 @@
 
 __author__ = 'Equifax CIA'
 __email__ = 'cia@equifax.com'
-__version__ = '1.1.0'
+__version__ = '1.1.1'
