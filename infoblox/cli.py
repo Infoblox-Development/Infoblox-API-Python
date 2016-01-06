@@ -47,7 +47,8 @@ def delete_cname(api, fqdn):
     api.delete_cname_record(fqdn)
 
 @cname.command('update')
-@click.argument('fqdn')
+@click.argument('old_fqdn')
+@click.argument('new_fqdn')
 @click.pass_obj
 def update_cname(api, old_fqdn, new_fqdn):
     '''Update a CNAME record.'''
@@ -89,9 +90,9 @@ def add_host_alias(api, host_fqdn, alias_fqdn):
 @click.argument('host_fqdn')
 @click.argument('host_alias')
 @click.pass_obj
-def delete_host_alias(api, host_fqdn, alias_fqdn):
+def delete_host_alias(api, host_fqdn, host_alias):
     '''Delete a host alias.'''
-    click.echo('deleting alias %s for host  %s' % (host_fqdn, alias_fqdn,))
+    click.echo('deleting alias %s for host  %s' % (host_fqdn, host_alias,))
     api.delete_host_record(host_fqdn, alias_fqdn)
 
 @hostrecord.command('by_extattrs')
@@ -105,7 +106,7 @@ def get_host_by_extattrs(api, extattrs):
 @hostrecord.command('by_regexp')
 @click.argument('regexp')
 @click.pass_obj
-def get_host_by_extattrs(api, regexp):
+def get_host_by_regexp(api, regexp):
     '''geting host by fqdn regexp filter.'''
     click.echo('getting host by fqdn regexp filter')
     api.get_host_by_regexp(regexp)
@@ -123,7 +124,7 @@ def get_host(api,  fqdn):
 @click.pass_obj
 def get_host_by_ip(api,ip):
     '''get a host by ip.'''
-    click.echo('get host record by IP %s ' % (ip))
+    click.echo('getting host record by ip %s ' % (ip))
     print (api.get_host_by_ip(ip))
 
 @hostrecord.command('extattrs')
@@ -131,7 +132,7 @@ def get_host_by_ip(api,ip):
 @click.pass_obj
 def get_host_extattrs(api, fqdn):
     '''get host extensible attributes'''
-    click.echo('get host %s extensible attributes ' % (fqdn))
+    click.echo('getting host extensible attributes %s ' % (fqdn))
     print (api.get_host_extattrs(fqdn))
 
 @cli.group()
@@ -168,44 +169,44 @@ def next_available_network(api, networkcontainer, cidr):
 @click.argument('network')
 @click.pass_obj
 def get_networkobject(api, network):
-    click.echo('getting network %s' % (network))
+    click.echo('getting networkobject %s ' % (network))
     print (api.get_network(network))
 
 @network.command('by_ip')
 @click.argument('ip')
 @click.pass_obj
 def get_network_by_ip(api, ip):
-    click.echo('getting network by IP %s' % (ip))
+    click.echo('getting network by ip %s' % (ip))
     print (api.get_network_by_ip(ip))
 
 @network.command('by_extattrs')
 @click.argument('extattrs')
 @click.pass_obj
-def get_network_by_extrattrs(api, extattrs):
+def get_network_by_extattrs(api, extattrs):
     click.echo('getting network by extensible attributes %s' % (extattrs))
     print (api.get_network_by_extattrs(api, extattrs))
 
 @network.command('extattrs')
 @click.argument('network')
 @click.pass_obj
-def get_network_extrattrs(api, network):
-    click.echo('getting extensible attributes %s' % (network))
+def get_network_extattrs(api, network):
+    click.echo('getting network extensible attributes %s' % (network))
     print (api.get_network_extattrs(network))
 
 @network.command('update_extattrs')
 @click.argument('network')
 @click.argument('extattrs')
 @click.pass_obj
-def update_network_extrattrs(api, network, extattrs):
-    click.echo('updating extensible attributes %s' % (extattrs))
+def update_network_extattrs(api, network, extattrs):
+    click.echo('updating network extensible attributes %s' % (extattrs))
     api.update_network_extattrs(network, extattrs)
 
 @network.command('delete_extattrs')
 @click.argument('network')
 @click.argument('extattrs')
 @click.pass_obj
-def delete_network_extrattrs(api, network, extattrs):
-    click.echo('deleting extensible attributes %s' % (extattrs))
+def delete_network_extattrs(api, network, extattrs):
+    click.echo('deleting network extensible attributes %s' % (extattrs))
     api.delete_network_extattrs(network, extattrs)
 
 @cli.group()
@@ -217,14 +218,14 @@ def networkcontainer():
 @click.argument('networkcontainer')
 @click.pass_obj
 def create_networkcontainer(api, networkcontainer):
-    click.echo('creating network container $s ' % (networkcontainer))
+    click.echo('creating network container %s ' % (networkcontainer))
     api.create_networkcontainer(networkcontainer)
 
 @networkcontainer.command('delete')
 @click.argument('networkcontainer')
 @click.pass_obj
 def delete_networkcontainer(api, networkcontainer):
-    click.echo('delete network container $s ' % (networkcontainer))
+    click.echo('deleting network container %s ' % (networkcontainer))
     api.delete_networkcontainer(networkcontainer)
 
 @cli.group()
@@ -251,7 +252,7 @@ def delete_txt_record(api, fqdn):
 @click.argument('regexp')
 @click.pass_obj
 def get_txt_by_regexp(api, regexp):
-    click.echo('getting  text record by regexp  %s ' % (regexp))
+    click.echo('getting text record by regexp  %s ' % (regexp))
     print (api.get_txt_by_regexp(regexp))
 
 @cli.group()
@@ -284,13 +285,13 @@ def ip():
 @click.argument('network')
 @click.pass_obj
 def get_next_available_ip(api, network):
-    click.echo('getting next available IP in %s ' % (network))
+    click.echo('getting next available ip in %s ' % (network))
     print (api.get_next_available_ip(network))
 
 @ip.command('by_host')
 @click.argument('fqdn')
 @click.pass_obj
 def get_ip_by_host(api, fqdn):
-    click.echo('getting IP for host  %s ' % (fqdn))
+    click.echo('getting ip for host  %s ' % (fqdn))
     print (api.get_ip_by_host(fqdn))
 
