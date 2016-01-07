@@ -11,23 +11,38 @@ from infoblox import cli
 
 def invoke(*args):
     runner = CliRunner()
-    return runner.invoke(cli.cli, args)
+    basics = ['--ipaddr=1.2.3.4', '--user=user1', '--password=pass1']
+    return runner.invoke(cli.cli, basics + list(args))
 
 
 class CreateCnameTests(unittest.TestCase):
 
-    @responses.activate
     @patch('infoblox.infoblox.Infoblox.create_cname_record')
     @patch('infoblox.infoblox.Infoblox.__init__', return_value=None)
     def setUp(self, init_mock, create_cname_mock):
-        responses.add(responses.POST, 'https://1.2.3.4/wapi/v1.4.2/record:cname')
         self.init_mock = init_mock
         self.create_cname_mock = create_cname_mock
-        self.result = invoke('--ipaddr=1.2.3.4',
-                             '--user=user1',
-                             '--password=pass1',
-                             'cname', 'create', 'a', 'b')
+        self.result = invoke('cname', 'create', 'a', 'b')
 
+    def test_create_cname_called_with_correct_fqdn(self):
+        args, __ = self.create_cname_mock.call_args
+        self.assertEqual(args[0], 'a')
+
+    def test_create_cname_called_with_correct_name(self):
+        args, __ = self.create_cname_mock.call_args
+        self.assertEqual(args[1], 'b')
+
+    def test_create_cname_called_exactly_once(self):
+        self.assertEqual(self.create_cname_mock.call_count, 1)
+
+    def test_exit_code_is_zero(self):
+        self.assertEqual(self.result.exit_code, 0)
+
+    # The following tests actually test just the click group "cli" but due to
+    # the nature of click require a full invocation of the command line
+    # (otherwise the cli exits with a non-zero exit code and prints the help
+    # text). They *could* be included on all test cases, but including them
+    # once in this test case is entirely sufficient.
     def test_init_called_with_correct_ipaddr(self):
         args, __ = self.init_mock.call_args
         self.assertEqual(args[0], '1.2.3.4')
@@ -59,25 +74,20 @@ class CreateCnameTests(unittest.TestCase):
     def test_init_called_exactly_once(self):
         self.assertEqual(self.init_mock.call_count, 1)
 
-    def test_create_cname_called_with_correct_fqdn(self):
-        args, __ = self.create_cname_mock.call_args
-        self.assertEqual(args[0], 'a')
 
-    def test_create_cname_called_with_correct_name(self):
-        args, __ = self.create_cname_mock.call_args
-        self.assertEqual(args[1], 'b')
+class DeleteCnameTests(unittest.TestCase):
 
-    def test_create_cname_called_exactly_once(self):
-        self.assertEqual(self.create_cname_mock.call_count, 1)
+    @patch('infoblox.infoblox.Infoblox.delete_cname_record')
+    def setUp(self, delete_cname_mock):
+        self.delete_cname_mock = delete_cname_mock
+        self.result = invoke('cname', 'delete', 'a')
 
-    def test_exit_code_is_zero(self):
-        self.assertEqual(self.result.exit_code, 0)
+    def test_delete_cname_called_exactly_once(self):
+        self.assertEqual(self.delete_cname_mock.call_count, 1)
 
+    def test_the_rest_of_delete_cname_here:)(self):
+        pass
 
-def test_create_cname():
-    runner = CliRunner()
-    result = runner.invoke(cli.create_cname, ['', ''])
-    assert 'adding cname' in result.output
 
 def test__delete_cname():
     runner = CliRunner()
