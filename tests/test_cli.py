@@ -1,6 +1,81 @@
-import click
 from click.testing import CliRunner
+import responses
+try:
+    import unittest2 as unittest
+except ImportError:
+    import unittest
+from unittest.mock import patch
+
 from infoblox import cli
+
+
+class CliTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        runner = CliRunner()
+        def run(*args):
+            return runner.invoke(cli.cli, args)
+        cls.run = run
+
+
+class CreateCnameTests(CliTests):
+    @responses.activate
+    @patch('infoblox.infoblox.Infoblox.create_cname')
+    @patch('infoblox.infoblox.Infoblox.__init__')
+    def setUp(self, init_mock, create_cname_mock):
+        responses.add(responses.POST, 'https://1.2.3.4/wapi/v1.4.2/record:cname')
+        self.init_mock = init_mock
+        self.create_cname_mock = create_cname_mock
+        self.result = self.run('--ipaddr=1.2.3.4',
+                               '--user=user1',
+                               '--password=pass1',
+                               'cname', 'create', 'a', 'b')
+
+    def test_init_called_with_correct_ipaddr(self):
+        args, __ = self.init_mock.call_args
+        self.assertEqual(args[0], '1.2.3.4')
+
+    def test_init_called_with_correct_user(self):
+        args, __ = self.init_mock.call_args
+        self.assertEqual(args[1], 'user1')
+
+    def test_init_called_with_correct_password(self):
+        args, __ = self.init_mock.call_args
+        self.assertEqual(args[2], 'pass1')
+
+    def test_init_called_with_default_wapi_version(self):
+        args, __ = self.init_mock.call_args
+        self.assertEqual(args[3], '1.6')
+
+    def test_init_called_with_default_dns_view(self):
+        args, __ = self.init_mock.call_args
+        self.assertEqual(args[4], 'default')
+
+    def test_init_called_with_default_network_view(self):
+        args, __ = self.init_mock.call_args
+        self.assertEqual(args[5], 'default')
+
+    def test_init_called_with_default_verify_ssl(self):
+        args, __ = self.init_mock.call_args
+        self.assertEqual(args[6], False)
+
+    def test_init_called_exactly_once(self):
+        self.assertEqual(self.init_mock.call_count, 1)
+
+    def test_create_cname_called_with_correct_fqdn(self):
+        args, __ = self.create_cname_mock.call_args
+        self.assertEqual(args[0], 'a')
+
+    def test_create_cname_called_with_correct_name(self):
+        args, __ = self.create_cname_mock.call_args
+        self.assertEqual(args[1], 'b')
+
+    def test_create_cname_called_exactly_once(self):
+        self.assertEqual(self.create_cname_mock.call_count, 1)
+
+    def test_exit_code_is_zero(self):
+        self.assertEqual(self.result.exit_code, 0)
+
 
 def test_create_cname():
     runner = CliRunner()
