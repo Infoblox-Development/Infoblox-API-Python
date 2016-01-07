@@ -9,27 +9,24 @@ from unittest.mock import patch
 from infoblox import cli
 
 
-class CliTests(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        runner = CliRunner()
-        def run(*args):
-            return runner.invoke(cli.cli, args)
-        cls.run = run
+def invoke(*args):
+    runner = CliRunner()
+    return runner.invoke(cli.cli, args)
 
 
-class CreateCnameTests(CliTests):
+class CreateCnameTests(unittest.TestCase):
+
     @responses.activate
-    @patch('infoblox.infoblox.Infoblox.create_cname')
-    @patch('infoblox.infoblox.Infoblox.__init__')
+    @patch('infoblox.infoblox.Infoblox.create_cname_record')
+    @patch('infoblox.infoblox.Infoblox.__init__', return_value=None)
     def setUp(self, init_mock, create_cname_mock):
         responses.add(responses.POST, 'https://1.2.3.4/wapi/v1.4.2/record:cname')
         self.init_mock = init_mock
         self.create_cname_mock = create_cname_mock
-        self.result = self.run('--ipaddr=1.2.3.4',
-                               '--user=user1',
-                               '--password=pass1',
-                               'cname', 'create', 'a', 'b')
+        self.result = invoke('--ipaddr=1.2.3.4',
+                             '--user=user1',
+                             '--password=pass1',
+                             'cname', 'create', 'a', 'b')
 
     def test_init_called_with_correct_ipaddr(self):
         args, __ = self.init_mock.call_args
@@ -233,34 +230,34 @@ def test_get_ip_by_host():
     result = runner.invoke(cli.get_ip_by_host, [''])
     assert 'getting ip for host' in result.output
 
-if __name__ == '__main__':
-    test__delete_cname()
-    test_create_cname()
-    test__update_cname()
-    test_create_host_record()
-    test_delete_host_record()
-    test_add_host_alias()
-    test_delete_host_alias
-    test_get_host_by_extattrs()
-    test_get_host_by_regexp()
-    test_get_host()
-    test_get_host_by_ip()
-    test_get_host_extattrs()
-    test_create_network()
-    test_delete_network()
-    test_get_next_available_network()
-    test_get_networkobject()
-    test_get_network_by_ip()
-    test_get_network_by_extattrs()
-    test_get_network_extrattrs()
-    test_update_network_extattrs()
-    test_delete_network_extattrs()
-    test_create_networkcontainer()
-    test_delete_networkcontainer()
-    test_create_txt_record()
-    test_delete_txt_record()
-    test_get_txt_by_regexp()
-    test_create_dhcp_range()
-    test_delete_dhcp_range()
-    test_get_next_available_ip()
-    test_get_ip_by_host()
+# if __name__ == '__main__':
+#     test__delete_cname()
+#     test_create_cname()
+#     test__update_cname()
+#     test_create_host_record()
+#     test_delete_host_record()
+#     test_add_host_alias()
+#     test_delete_host_alias
+#     test_get_host_by_extattrs()
+#     test_get_host_by_regexp()
+#     test_get_host()
+#     test_get_host_by_ip()
+#     test_get_host_extattrs()
+#     test_create_network()
+#     test_delete_network()
+#     test_get_next_available_network()
+#     test_get_networkobject()
+#     test_get_network_by_ip()
+#     test_get_network_by_extattrs()
+#     test_get_network_extrattrs()
+#     test_update_network_extattrs()
+#     test_delete_network_extattrs()
+#     test_create_networkcontainer()
+#     test_delete_networkcontainer()
+#     test_create_txt_record()
+#     test_delete_txt_record()
+#     test_get_txt_by_regexp()
+#     test_create_dhcp_range()
+#     test_delete_dhcp_range()
+#     test_get_next_available_ip()
+#     test_get_ip_by_host()
