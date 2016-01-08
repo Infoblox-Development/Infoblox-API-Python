@@ -184,7 +184,7 @@ def get_network_by_ip(api, ip):
 @click.pass_obj
 def get_network_by_extattrs(api, extattrs):
     click.echo('getting network by extensible attributes %s' % (extattrs))
-    print (api.get_network_by_extattrs(api, extattrs))
+    print (api.get_network_by_extattrs(extattrs))
 
 @network.command('extattrs')
 @click.argument('network')

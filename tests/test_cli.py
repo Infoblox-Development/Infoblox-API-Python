@@ -348,15 +348,32 @@ class GetNetworkByIpTests(unittest.TestCase):
     def test_exit_code_is_zero(self):
         self.assertEqual(self.result.exit_code, 0)
 
+class GetNetworkByIpTests(unittest.TestCase):
+    @patch('infoblox.infoblox.Infoblox.get_network_by_ip')
+    def setUp(self, get_network_by_ip_mock):
+        self.get_network_by_ip_mock = get_network_by_ip_mock
+        self.result = invoke('network', 'by_ip', 'a')
+
+    def test_get_network_by_ip_called_with_correct_ip(self):
+        args, __ = self.get_network_by_ip_mock.call_args
+        self.assertEqual(args[0], 'a')
+
+    def test_get_network_by_ip_called_exactly_once(self):
+        self.assertEqual(self.get_network_by_ip_mock.call_count, 1)
+
+    def test_exit_code_is_zero(self):
+        self.assertEqual(self.result.exit_code, 0)
+
+
 class GetNetworkByExtattrsTests(unittest.TestCase):
     @patch('infoblox.infoblox.Infoblox.get_network_by_extattrs')
     def setUp(self, get_network_by_extattrs_mock):
         self.get_network_by_extattrs_mock = get_network_by_extattrs_mock
         self.result = invoke('network', 'by_extattrs', 'a')
 
-    # def test_get_network_by_extattrs_called_with_correct_extattrs(self):
-    #     args, __ = self.get_network_by_extattrs_mock.call_args
-    #     self.assertEqual(args[0], 'a')
+    def test_get_network_by_extattrs_called_with_correct_extattrs(self):
+        args, __ = self.get_network_by_extattrs_mock.call_args
+        self.assertEqual(args[0], 'a')
 
     def test_get_network_by_extattrs_called_exactly_once(self):
         self.assertEqual(self.get_network_by_extattrs_mock.call_count, 1)
