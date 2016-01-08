@@ -8,10 +8,12 @@ from unittest.mock import patch
 
 from infoblox import cli
 
+
 def invoke(*args):
     runner = CliRunner()
     basics = ['--ipaddr=1.2.3.4', '--user=user1', '--password=pass1']
     return runner.invoke(cli.cli, basics + list(args))
+
 
 class CreateCnameTests(unittest.TestCase):
 
@@ -72,6 +74,7 @@ class CreateCnameTests(unittest.TestCase):
     def test_init_called_exactly_once(self):
         self.assertEqual(self.init_mock.call_count, 1)
 
+
 class DeleteCnameTests(unittest.TestCase):
     @patch('infoblox.infoblox.Infoblox.delete_cname_record')
     def setUp(self, delete_cname_mock):
@@ -87,6 +90,7 @@ class DeleteCnameTests(unittest.TestCase):
 
     def test_exit_code_is_zero(self):
         self.assertEqual(self.result.exit_code, 0)
+
 
 class UpdateCnameTests(unittest.TestCase):
     @patch('infoblox.infoblox.Infoblox.update_cname_record')
@@ -108,6 +112,7 @@ class UpdateCnameTests(unittest.TestCase):
     def test_exit_code_is_zero(self):
         self.assertEqual(self.result.exit_code, 0)
 
+
 class CreateHostrecordTests(unittest.TestCase):
     @patch('infoblox.infoblox.Infoblox.create_host_record')
     def setUp(self, create_host_record_mock):
@@ -128,6 +133,7 @@ class CreateHostrecordTests(unittest.TestCase):
     def test_exit_code_is_zero(self):
         self.assertEqual(self.result.exit_code, 0)
 
+
 class DeleteHostrecordTests(unittest.TestCase):
     @patch('infoblox.infoblox.Infoblox.delete_host_record')
     def setUp(self, delete_host_record_mock):
@@ -143,6 +149,7 @@ class DeleteHostrecordTests(unittest.TestCase):
 
     def test_exit_code_is_zero(self):
         self.assertEqual(self.result.exit_code, 0)
+
 
 class AddHostaliasTests(unittest.TestCase):
     @patch('infoblox.infoblox.Infoblox.add_host_alias')
@@ -164,6 +171,7 @@ class AddHostaliasTests(unittest.TestCase):
     def test_exit_code_is_zero(self):
         self.assertEqual(self.result.exit_code, 0)
 
+
 class DeleteHostaliasTests(unittest.TestCase):
     @patch('infoblox.infoblox.Infoblox.delete_host_alias')
     def setUp(self, delete_host_alias_mock):
@@ -184,6 +192,7 @@ class DeleteHostaliasTests(unittest.TestCase):
     def test_exit_code_is_zero(self):
         self.assertEqual(self.result.exit_code, 0)
 
+
 class GetHostByExtattrsTests(unittest.TestCase):
     @patch('infoblox.infoblox.Infoblox.get_host_by_extattrs')
     def setUp(self, get_host_by_extattrs_mock):
@@ -199,6 +208,7 @@ class GetHostByExtattrsTests(unittest.TestCase):
 
     def test_exit_code_is_zero(self):
         self.assertEqual(self.result.exit_code, 0)
+
 
 class GetHostByRegexpTests(unittest.TestCase):
     @patch('infoblox.infoblox.Infoblox.get_host_by_regexp')
@@ -216,6 +226,7 @@ class GetHostByRegexpTests(unittest.TestCase):
     def test_exit_code_is_zero(self):
         self.assertEqual(self.result.exit_code, 0)
 
+
 class GetHostTests(unittest.TestCase):
     @patch('infoblox.infoblox.Infoblox.get_host')
     def setUp(self, get_host_mock):
@@ -231,6 +242,7 @@ class GetHostTests(unittest.TestCase):
 
     def test_exit_code_is_zero(self):
         self.assertEqual(self.result.exit_code, 0)
+
 
 class GetHostByIPTests(unittest.TestCase):
     @patch('infoblox.infoblox.Infoblox.get_host_by_ip')
@@ -248,6 +260,7 @@ class GetHostByIPTests(unittest.TestCase):
     def test_exit_code_is_zero(self):
         self.assertEqual(self.result.exit_code, 0)
 
+
 class GetHostExtattrsTests(unittest.TestCase):
     @patch('infoblox.infoblox.Infoblox.get_host_extattrs')
     def setUp(self, get_host_extattrs_mock):
@@ -263,6 +276,7 @@ class GetHostExtattrsTests(unittest.TestCase):
 
     def test_exit_code_is_zero(self):
         self.assertEqual(self.result.exit_code, 0)
+
 
 class CreateNetworkTests(unittest.TestCase):
     @patch('infoblox.infoblox.Infoblox.create_network')
@@ -280,6 +294,7 @@ class CreateNetworkTests(unittest.TestCase):
     def test_exit_code_is_zero(self):
         self.assertEqual(self.result.exit_code, 0)
 
+
 class DeleteNetworkTests(unittest.TestCase):
     @patch('infoblox.infoblox.Infoblox.delete_network')
     def setUp(self, delete_network_mock):
@@ -295,6 +310,7 @@ class DeleteNetworkTests(unittest.TestCase):
 
     def test_exit_code_is_zero(self):
         self.assertEqual(self.result.exit_code, 0)
+
 
 class NextNetworkTests(unittest.TestCase):
     @patch('infoblox.infoblox.Infoblox.get_next_available_network')
@@ -316,6 +332,7 @@ class NextNetworkTests(unittest.TestCase):
     def test_exit_code_is_zero(self):
         self.assertEqual(self.result.exit_code, 0)
 
+
 class GetNetworkTests(unittest.TestCase):
     @patch('infoblox.infoblox.Infoblox.get_network')
     def setUp(self, get_network_mock):
@@ -332,6 +349,7 @@ class GetNetworkTests(unittest.TestCase):
     def test_exit_code_is_zero(self):
         self.assertEqual(self.result.exit_code, 0)
 
+
 class GetNetworkByIpTests(unittest.TestCase):
     @patch('infoblox.infoblox.Infoblox.get_network_by_ip')
     def setUp(self, get_network_by_ip_mock):
@@ -347,6 +365,7 @@ class GetNetworkByIpTests(unittest.TestCase):
 
     def test_exit_code_is_zero(self):
         self.assertEqual(self.result.exit_code, 0)
+
 
 class GetNetworkByIpTests(unittest.TestCase):
     @patch('infoblox.infoblox.Infoblox.get_network_by_ip')
@@ -381,6 +400,7 @@ class GetNetworkByExtattrsTests(unittest.TestCase):
     def test_exit_code_is_zero(self):
         self.assertEqual(self.result.exit_code, 0)
 
+
 class GetNetworkExtattrsTests(unittest.TestCase):
     @patch('infoblox.infoblox.Infoblox.get_network_extattrs')
     def setUp(self, get_network_extattrs_mock):
@@ -396,6 +416,7 @@ class GetNetworkExtattrsTests(unittest.TestCase):
 
     def test_exit_code_is_zero(self):
         self.assertEqual(self.result.exit_code, 0)
+
 
 class UpdateNetworkExtattrsTests(unittest.TestCase):
     @patch('infoblox.infoblox.Infoblox.update_network_extattrs')
@@ -417,6 +438,7 @@ class UpdateNetworkExtattrsTests(unittest.TestCase):
     def test_exit_code_is_zero(self):
         self.assertEqual(self.result.exit_code, 0)
 
+
 class DeleteNetworkExtattrsTests(unittest.TestCase):
     @patch('infoblox.infoblox.Infoblox.delete_network_extattrs')
     def setUp(self, delete_network_extattrs_mock):
@@ -437,6 +459,7 @@ class DeleteNetworkExtattrsTests(unittest.TestCase):
     def test_exit_code_is_zero(self):
         self.assertEqual(self.result.exit_code, 0)
 
+
 class CreateNetworkContainerTests(unittest.TestCase):
     @patch('infoblox.infoblox.Infoblox.create_networkcontainer')
     def setUp(self, create_network_container_mock):
@@ -453,6 +476,7 @@ class CreateNetworkContainerTests(unittest.TestCase):
     def test_exit_code_is_zero(self):
         self.assertEqual(self.result.exit_code, 0)
 
+
 class DeleteNetworkContainerTests(unittest.TestCase):
     @patch('infoblox.infoblox.Infoblox.delete_networkcontainer')
     def setUp(self, delete_network_container_mock):
@@ -468,6 +492,7 @@ class DeleteNetworkContainerTests(unittest.TestCase):
 
     def test_exit_code_is_zero(self):
         self.assertEqual(self.result.exit_code, 0)
+
 
 class CreateTxtRecordTests(unittest.TestCase):
     @patch('infoblox.infoblox.Infoblox.create_txt_record')
@@ -489,6 +514,7 @@ class CreateTxtRecordTests(unittest.TestCase):
     def test_exit_code_is_zero(self):
         self.assertEqual(self.result.exit_code, 0)
 
+
 class DeleteTxtRecordTests(unittest.TestCase):
     @patch('infoblox.infoblox.Infoblox.delete_txt_record')
     def setUp(self, delete_txt_record_mock):
@@ -505,6 +531,7 @@ class DeleteTxtRecordTests(unittest.TestCase):
     def test_exit_code_is_zero(self):
         self.assertEqual(self.result.exit_code, 0)
 
+
 class GetTxtRecordByRegexpTests(unittest.TestCase):
     @patch('infoblox.infoblox.Infoblox.get_txt_by_regexp')
     def setUp(self, get_txt_by_regexp_mock):
@@ -520,6 +547,7 @@ class GetTxtRecordByRegexpTests(unittest.TestCase):
 
     def test_exit_code_is_zero(self):
         self.assertEqual(self.result.exit_code, 0)
+
 
 class CreateDhcpRangeTests(unittest.TestCase):
     @patch('infoblox.infoblox.Infoblox.create_dhcp_range')
@@ -541,6 +569,7 @@ class CreateDhcpRangeTests(unittest.TestCase):
     def test_exit_code_is_zero(self):
         self.assertEqual(self.result.exit_code, 0)
 
+
 class DeleteDhcpRangeTests(unittest.TestCase):
     @patch('infoblox.infoblox.Infoblox.delete_dhcp_range')
     def setUp(self, delete_dhcp_range_mock):
@@ -561,6 +590,7 @@ class DeleteDhcpRangeTests(unittest.TestCase):
     def test_exit_code_is_zero(self):
         self.assertEqual(self.result.exit_code, 0)
 
+
 class GetNextIPTests(unittest.TestCase):
     @patch('infoblox.infoblox.Infoblox.get_next_available_ip')
     def setUp(self, get_next_available_ip_mock):
@@ -576,6 +606,7 @@ class GetNextIPTests(unittest.TestCase):
 
     def test_exit_code_is_zero(self):
         self.assertEqual(self.result.exit_code, 0)
+
 
 class GetIpByHostTests(unittest.TestCase):
     @patch('infoblox.infoblox.Infoblox.get_ip_by_host')
