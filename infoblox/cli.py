@@ -27,7 +27,7 @@ def cli(ctx, ipaddr, user, password, wapi_version, dns_view, network_view, verif
 @cli.group()
 def cname():
     '''Create and delete CNAME records'''
-    pass
+    pass # pragma: no cover
 
 @cname.command('create')
 @click.argument('fqdn')
@@ -53,12 +53,12 @@ def delete_cname(api, fqdn):
 def update_cname(api, old_fqdn, new_fqdn):
     '''Update a CNAME record.'''
     click.echo ('updating cname from %s to %s' % (old_fqdn, new_fqdn))
-    api.update_cname_record(fqdn)
+    api.update_cname_record(old_fqdn, new_fqdn)
 
 @cli.group()
 def hostrecord():
     ''' HOST records.'''
-    pass
+    pass # pragma: no cover
 
 @hostrecord.command('create')
 @click.argument('address')
@@ -84,7 +84,7 @@ def delete_host_record(api, fqdn):
 def add_host_alias(api, host_fqdn, alias_fqdn):
     '''add a host record.'''
     click.echo('adding alias %s for host  %s' % (alias_fqdn, host_fqdn,))
-    api.delete_host_record(host_fqdn, alias_fqdn)
+    api.add_host_alias(host_fqdn, alias_fqdn)
 
 @hostrecord.command('delete_alias')
 @click.argument('host_fqdn')
@@ -93,7 +93,7 @@ def add_host_alias(api, host_fqdn, alias_fqdn):
 def delete_host_alias(api, host_fqdn, host_alias):
     '''Delete a host alias.'''
     click.echo('deleting alias %s for host  %s' % (host_fqdn, host_alias,))
-    api.delete_host_record(host_fqdn, alias_fqdn)
+    api.delete_host_alias(host_fqdn, host_alias)
 
 @hostrecord.command('by_extattrs')
 @click.argument('extattrs')
@@ -138,7 +138,7 @@ def get_host_extattrs(api, fqdn):
 @cli.group()
 def network():
     ''' get network object fields'''
-    pass
+    pass # pragma: no cover
 
 @network.command('create')
 @click.argument('network')
@@ -212,7 +212,7 @@ def delete_network_extattrs(api, network, extattrs):
 @cli.group()
 def networkcontainer():
     ''' network container'''
-    pass
+    pass # pragma: no cover
 
 @networkcontainer.command('create')
 @click.argument('networkcontainer')
@@ -231,7 +231,7 @@ def delete_networkcontainer(api, networkcontainer):
 @cli.group()
 def txtrecord():
     ''' DNS text record '''
-    pass
+    pass # pragma: no cover
 
 @txtrecord.command('create')
 @click.argument('text')
@@ -258,7 +258,7 @@ def get_txt_by_regexp(api, regexp):
 @cli.group()
 def dhcp():
     ''' DHCP range '''
-    pass
+    pass # pragma: no cover
 
 @dhcp.command('create')
 @click.argument('start_ip_v4') 
@@ -279,7 +279,7 @@ def delete_dhcp_range(api, start_ip_v4, end_ip_v4):
 @cli.group()
 def ip():
     '''IP address.'''
-    pass
+    pass # pragma: no cover
 
 @ip.command('next_ip')
 @click.argument('network')
@@ -294,4 +294,3 @@ def get_next_available_ip(api, network):
 def get_ip_by_host(api, fqdn):
     click.echo('getting ip for host  %s ' % (fqdn))
     print (api.get_ip_by_host(fqdn))
-
