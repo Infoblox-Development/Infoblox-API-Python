@@ -1,5 +1,4 @@
 from click.testing import CliRunner
-from infoblox import cli
 import responses
 try:
     import unittest2 as unittest
@@ -7,11 +6,27 @@ except ImportError:
     import unittest
 from unittest.mock import patch
 
+from infoblox import cli
+<<<<<<< HEAD
+import responses
+try:
+    import unittest2 as unittest
+except ImportError:
+    import unittest
+from unittest.mock import patch
+=======
+
+>>>>>>> ed66c794f8735427647bb812b649f95f0b7652d7
+
 def invoke(*args):
     runner = CliRunner()
     basics = ['--ipaddr=1.2.3.4', '--user=user1', '--password=pass1']
     return runner.invoke(cli.cli, basics + list(args))
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> ed66c794f8735427647bb812b649f95f0b7652d7
 class CreateCnameTests(unittest.TestCase):
 
     @patch('infoblox.infoblox.Infoblox.create_cname_record')
@@ -43,6 +58,51 @@ class CreateCnameTests(unittest.TestCase):
     def test_init_called_with_correct_ipaddr(self):
         args, __ = self.init_mock.call_args
         self.assertEqual(args[0], '1.2.3.4')
+<<<<<<< HEAD
+=======
+
+    def test_init_called_with_correct_user(self):
+        args, __ = self.init_mock.call_args
+        self.assertEqual(args[1], 'user1')
+
+    def test_init_called_with_correct_password(self):
+        args, __ = self.init_mock.call_args
+        self.assertEqual(args[2], 'pass1')
+
+    def test_init_called_with_default_wapi_version(self):
+        args, __ = self.init_mock.call_args
+        self.assertEqual(args[3], '1.6')
+
+    def test_init_called_with_default_dns_view(self):
+        args, __ = self.init_mock.call_args
+        self.assertEqual(args[4], 'default')
+
+    def test_init_called_with_default_network_view(self):
+        args, __ = self.init_mock.call_args
+        self.assertEqual(args[5], 'default')
+
+    def test_init_called_with_default_verify_ssl(self):
+        args, __ = self.init_mock.call_args
+        self.assertEqual(args[6], False)
+
+    def test_init_called_exactly_once(self):
+        self.assertEqual(self.init_mock.call_count, 1)
+
+
+class DeleteCnameTests(unittest.TestCase):
+
+    @patch('infoblox.infoblox.Infoblox.delete_cname_record')
+    def setUp(self, delete_cname_mock):
+        self.delete_cname_mock = delete_cname_mock
+        self.result = invoke('cname', 'delete', 'a')
+
+    def test_delete_cname_called_exactly_once(self):
+        self.assertEqual(self.delete_cname_mock.call_count, 1)
+
+    def test_the_rest_of_delete_cname_here:)(self):
+        pass
+
+>>>>>>> ed66c794f8735427647bb812b649f95f0b7652d7
 
     def test_init_called_with_correct_user(self):
         args, __ = self.init_mock.call_args
@@ -241,6 +301,7 @@ class GetHostByIPTests(unittest.TestCase):
         args, __ = self.get_host_by_ip_mock.call_args
         self.assertEqual(args[0], 'a')
 
+<<<<<<< HEAD
     def test_get_host_by_ip_called_exactly_once(self):
         self.assertEqual(self.get_host_by_ip_mock.call_count, 1)
 
@@ -574,3 +635,41 @@ class GetIpByHostTests(unittest.TestCase):
 
     def test_exit_code_is_zero(self):
         self.assertEqual(self.result.exit_code, 0)
+=======
+def test_get_ip_by_host():
+    runner = CliRunner()
+    result = runner.invoke(cli.get_ip_by_host, [''])
+    assert 'getting ip for host' in result.output
+
+# if __name__ == '__main__':
+#     test__delete_cname()
+#     test_create_cname()
+#     test__update_cname()
+#     test_create_host_record()
+#     test_delete_host_record()
+#     test_add_host_alias()
+#     test_delete_host_alias
+#     test_get_host_by_extattrs()
+#     test_get_host_by_regexp()
+#     test_get_host()
+#     test_get_host_by_ip()
+#     test_get_host_extattrs()
+#     test_create_network()
+#     test_delete_network()
+#     test_get_next_available_network()
+#     test_get_networkobject()
+#     test_get_network_by_ip()
+#     test_get_network_by_extattrs()
+#     test_get_network_extrattrs()
+#     test_update_network_extattrs()
+#     test_delete_network_extattrs()
+#     test_create_networkcontainer()
+#     test_delete_networkcontainer()
+#     test_create_txt_record()
+#     test_delete_txt_record()
+#     test_get_txt_by_regexp()
+#     test_create_dhcp_range()
+#     test_delete_dhcp_range()
+#     test_get_next_available_ip()
+#     test_get_ip_by_host()
+>>>>>>> ed66c794f8735427647bb812b649f95f0b7652d7
