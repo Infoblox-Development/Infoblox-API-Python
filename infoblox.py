@@ -152,6 +152,45 @@ class Infoblox(object):
 	except Exception:
 	    raise
 
+    def reserve_ip_addr(self, address, name, comment):
+        """ Implements IBA REST API call to reserve IBA IPv4 address 
+	Returns None 
+	:param address: IP v4 address in CIDR format without subnet
+        :param name: reservation name
+        :param comment: context 
+        """
+        attr= lambda key, val: '"' + key + '":' + '"' + val + '"'
+        extattr = lambda key, val: '"' + key + '":' + '{"value":"' + val + '"}'
+
+        rest_url = 'https://' + self.iba_host + '/wapi/v' + self.iba_wapi_version + '/fixedaddress'
+        payload = '{' + attr("ipv4addr", address) + ',' + \
+        attr("mac", "00:00:00:00:00:00") + ',' + \
+        attr("name", name) + ',' + \
+        attr("comment", comment) + \
+
+        # example extattrs
+
+        #'"extattrs": {' + \
+        #extattr("Editor", editor) + "," + \
+        '}'
+
+        print payload
+	r = requests.post(url=rest_url, auth=(self.iba_user, self.iba_password), verify=self.iba_verify_ssl, data=str(payload))
+	r_json = r.json()
+        try:
+            if r.status_code == 200 or r.status_code == 201:
+                return
+	    else:
+		if 'text' in r_json:
+		    raise InfobloxGeneralException(r_json['text'])
+		else:
+		    r.raise_for_status()
+	except ValueError:
+	    raise Exception(r)
+	except Exception:
+	    raise
+
+
     def create_txt_record(self, text, fqdn):
 	""" Implements IBA REST API call to create IBA txt record
 	Returns IP v4 address assigned to the host
