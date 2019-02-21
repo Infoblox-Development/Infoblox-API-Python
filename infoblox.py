@@ -947,17 +947,41 @@ class Infoblox(object):
 	except Exception:
 	    raise
 
-    def create_networkcontainer(self, networkcontainer):
+    def create_networkcontainer(self, networkcontainer, comment):
 	""" Implements IBA REST API call to create DHCP network containert object
 	:param networkcontainer: network container in CIDR format
 	"""
 	rest_url = 'https://' + self.iba_host + '/wapi/v' + self.iba_wapi_version + '/networkcontainer'
-	payload = '{"network": "' + networkcontainer + '","network_view": "' + self.iba_network_view + '"}'
+	payload = '{"network": "' + networkcontainer + '", "comment": "'  + comment + '","network_view": "' + self.iba_network_view + '"}'
+	print(rest_url, payload)
 	try:
 	    r = requests.post(url=rest_url, auth=(self.iba_user, self.iba_password), verify=self.iba_verify_ssl, data=payload)
 	    r_json = r.json()
 	    if r.status_code == 200 or r.status_code == 201:
 		return
+	    else:
+		if 'text' in r_json:
+		    raise InfobloxGeneralException(r_json['text'])
+		else:
+		    r.raise_for_status()
+	except ValueError:
+	    raise Exception(r)
+	except Exception:
+	    raise
+
+    def list_networkcontainer(self, octect):
+	""" Implements IBA REST API call to list all container in a network
+    example uri: https://infoblox/wapi/v2.6/networkcontainer?network~=10&_return_type=json
+	:param octect: first octect from container ie 10 for a 10.0.0.0/8 network
+	"""
+	rest_url = 'https://' + self.iba_host + '/wapi/v' + self.iba_wapi_version + '/networkcontainer?network~=' + octect
+	print(rest_url)
+	try:
+	    r = requests.get(url=rest_url, auth=(self.iba_user, self.iba_password), verify=self.iba_verify_ssl)
+	    r_json = r.json()
+	    if r.status_code == 200 or r.status_code == 201:
+			for i in range(len(r_json)):
+					print(r_json[i]['network'])
 	    else:
 		if 'text' in r_json:
 		    raise InfobloxGeneralException(r_json['text'])
