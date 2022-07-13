@@ -43,7 +43,7 @@ Class **Infoblox** implements the following methods:
 
 Example:
 
-```
+```python
 import infoblox
 
 iba_api = infoblox.Infoblox('10.10.20.32', 'admin', 'secret', '1.6', 'internal', 'default')
